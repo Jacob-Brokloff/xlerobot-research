@@ -1,0 +1,26 @@
+name: Train HF
+
+# Manual kick for a train:hf run. This submits a real Hugging Face Job when
+# HF_TOKEN is set and the dataset repo exists. It does not run on push or merge.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install training extra
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[train]"
+      - name: Submit lerobot-train to HF Jobs
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python scripts/train.py --route hf --dispatch

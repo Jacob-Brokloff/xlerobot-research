@@ -1,0 +1,65 @@
+# LeRobot 0.6.1 TrainPipelineConfig + ACTConfig.
+# https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/configs/train.py
+#
+# Local debug config. job.target=local does not submit a Hugging Face Job.
+# push_to_hub is false so a laptop run does not need HF_TOKEN.
+#
+# The dataset repo does not exist yet. Replace dataset.repo_id after demonstrations
+# are collected. A real run also needs: pip install -e ".[train]"
+#
+#   lerobot-train --config configs/act_xlerobot.yaml --policy.device=cpu
+
+dataset:
+  repo_id: Jacob-Brokloff/xlerobot-demo
+  streaming: false
+
+policy:
+  type: act
+  device: cpu
+  use_amp: false
+  push_to_hub: false
+  repo_id: Jacob-Brokloff/xlerobot-act
+  private: false
+  license: mit
+  tags:
+    - xlerobot
+    - act
+    - lerobot
+  input_features: null
+  output_features: null
+  chunk_size: 100
+  n_action_steps: 100
+  n_obs_steps: 1
+  dim_model: 512
+  n_heads: 8
+  n_encoder_layers: 4
+  n_decoder_layers: 1
+  use_vae: true
+  latent_dim: 32
+  kl_weight: 10.0
+  vision_backbone: resnet18
+
+job:
+  target: local
+  image: huggingface/lerobot-gpu:latest
+  timeout: 6h
+  detach: false
+  tags:
+    - xlerobot
+    - act
+
+output_dir: outputs/train/act_xlerobot
+job_name: act_xlerobot
+seed: 1000
+steps: 100000
+batch_size: 8
+num_workers: 2
+log_freq: 200
+save_freq: 20000
+save_checkpoint: true
+save_checkpoint_to_hub: false
+env_eval_freq: 0
+eval_steps: 0
+use_policy_training_preset: true
+wandb:
+  enable: false

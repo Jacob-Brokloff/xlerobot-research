@@ -1,0 +1,27 @@
+name: Train homelab
+
+# Manual kick, or started from Train on merge when XLEROBOT_DISPATCH_HOMELAB=true.
+# Do not run this until a self-hosted runner with labels self-hosted and
+# xlerobot-gpu is online. Without that runner the job waits in the queue.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  train:
+    runs-on: [self-hosted, xlerobot-gpu]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install training extra
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[train]"
+      - name: Train on this GPU and push the policy
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python scripts/train.py --route homelab --dispatch

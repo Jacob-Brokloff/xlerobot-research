@@ -1,0 +1,8 @@
+# Routing labels. CI does not create these if the token cannot.
+# Apply them on a pull request before merge. See docs/labels-and-secrets.md.
+- name: "train:hf"
+  color: "1F6FEB"
+  description: "On merge, route training to Hugging Face Jobs (lerobot-train)."
+- name: "train:homelab"
+  color: "238636"
+  description: "On merge, route training to the homelab self-hosted GPU runner."

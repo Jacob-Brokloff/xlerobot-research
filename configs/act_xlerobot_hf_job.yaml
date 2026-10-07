@@ -1,0 +1,68 @@
+# LeRobot 0.6.1 ACT config that submits to Hugging Face Jobs.
+# lerobot-train reads job.target and, when it is not "local", calls submit_to_hf.
+#
+# Flavor a10g-small is the scaffold default. Confirm price and availability with:
+#   hf jobs hardware
+# See https://huggingface.co/docs/lerobot/hardware_guide
+#
+# Requires environment variable HF_TOKEN (GitHub Actions secret of the same name)
+# with write access to the policy repo. Do not put a token in this file.
+# detach=true so a GitHub-hosted dispatcher submits and exits; logs stay on the HF job.
+#
+#   HF_TOKEN=... lerobot-train --config configs/act_xlerobot_hf_job.yaml
+
+dataset:
+  repo_id: Jacob-Brokloff/xlerobot-demo
+  streaming: false
+
+policy:
+  type: act
+  device: cuda
+  use_amp: true
+  push_to_hub: true
+  repo_id: Jacob-Brokloff/xlerobot-act
+  private: false
+  license: mit
+  tags:
+    - xlerobot
+    - act
+    - lerobot
+  input_features: null
+  output_features: null
+  chunk_size: 100
+  n_action_steps: 100
+  n_obs_steps: 1
+  dim_model: 512
+  n_heads: 8
+  n_encoder_layers: 4
+  n_decoder_layers: 1
+  use_vae: true
+  latent_dim: 32
+  kl_weight: 10.0
+  vision_backbone: resnet18
+
+job:
+  target: a10g-small
+  image: huggingface/lerobot-gpu:latest
+  timeout: 6h
+  detach: true
+  tags:
+    - xlerobot
+    - act
+    - train:hf
+
+output_dir: outputs/train/act_xlerobot_hf
+job_name: act_xlerobot_hf
+seed: 1000
+steps: 100000
+batch_size: 8
+num_workers: 2
+log_freq: 200
+save_freq: 20000
+save_checkpoint: true
+save_checkpoint_to_hub: true
+env_eval_freq: 0
+eval_steps: 0
+use_policy_training_preset: true
+wandb:
+  enable: false

@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=71,<81"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xlerobot-research"
+version = "0.1.0"
+description = "XLeRobot imitation and RL research: a CPU MuJoCo env, LeRobot ACT configs, and CI that routes training by GitHub label."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Jacob Brokloff" }]
+keywords = ["robotics", "lerobot", "mujoco", "xlerobot", "imitation-learning"]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "gymnasium>=1.1.1,<2",
+  "huggingface-hub>=1.0,<2",
+  "mujoco>=3.3.0,<3.6",
+  "numpy>=2.0,<2.3",
+]
+
+[project.optional-dependencies]
+# LeRobot 0.6.1 is the config target. It requires Python >=3.12 and pulls PyTorch.
+# Install it on a training machine or in the HF / homelab job, not in the CPU smoke CI.
+train = ["lerobot>=0.6.1,<0.7"]
+dev = ["pytest>=8,<9", "ruff>=0.11,<1"]
+
+[project.urls]
+Homepage = "https://github.com/Jacob-Brokloff/xlerobot-research"
+Repository = "https://github.com/Jacob-Brokloff/xlerobot-research"
+XLeRobot = "https://github.com/Vector-Wangel/XLeRobot"
+LeRobot = "https://github.com/huggingface/lerobot"
+
+[tool.setuptools.packages.find]
+where = ["envs"]
+
+[tool.setuptools.package-data]
+xlerobot_mujoco = ["assets/*.xml"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["envs", "scripts", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

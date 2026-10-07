@@ -1,0 +1,4 @@
+include README.md LICENSE NOTICE
+recursive-include envs/xlerobot_mujoco/assets *.xml
+recursive-include configs *.yaml
+recursive-include docs *.md

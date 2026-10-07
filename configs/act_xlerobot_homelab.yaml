@@ -1,0 +1,62 @@
+# LeRobot 0.6.1 ACT config for the homelab GPU runner.
+# job.target=local because the GPU is the GitHub Actions runner, not an HF Jobs flavor.
+# The runner still uploads the policy, so HF_TOKEN must be available on that machine
+# (or passed by the workflow). Do not put a token in this file.
+#
+#   lerobot-train --config configs/act_xlerobot_homelab.yaml
+
+dataset:
+  repo_id: Jacob-Brokloff/xlerobot-demo
+  streaming: false
+
+policy:
+  type: act
+  device: cuda
+  use_amp: true
+  push_to_hub: true
+  repo_id: Jacob-Brokloff/xlerobot-act
+  private: false
+  license: mit
+  tags:
+    - xlerobot
+    - act
+    - lerobot
+  input_features: null
+  output_features: null
+  chunk_size: 100
+  n_action_steps: 100
+  n_obs_steps: 1
+  dim_model: 512
+  n_heads: 8
+  n_encoder_layers: 4
+  n_decoder_layers: 1
+  use_vae: true
+  latent_dim: 32
+  kl_weight: 10.0
+  vision_backbone: resnet18
+
+job:
+  target: local
+  image: huggingface/lerobot-gpu:latest
+  timeout: 6h
+  detach: false
+  tags:
+    - xlerobot
+    - act
+    - train:homelab
+
+output_dir: outputs/train/act_xlerobot_homelab
+job_name: act_xlerobot_homelab
+seed: 1000
+steps: 100000
+batch_size: 8
+num_workers: 2
+log_freq: 200
+save_freq: 20000
+save_checkpoint: true
+save_checkpoint_to_hub: true
+env_eval_freq: 0
+eval_steps: 0
+use_policy_training_preset: true
+wandb:
+  enable: false

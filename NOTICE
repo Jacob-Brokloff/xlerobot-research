@@ -1,0 +1,21 @@
+XLeRobot kinematic reference
+=============================
+
+Joint names and joint ranges in
+envs/xlerobot_mujoco/assets/xlerobot_placeholder.xml are adapted from the
+XLeRobot MuJoCo model:
+
+  Vector-Wangel/XLeRobot
+  simulation/mujoco/xlerobot.xml
+  https://github.com/Vector-Wangel/XLeRobot
+  https://github.com/Vector-Wangel/XLeRobot/blob/main/simulation/mujoco/xlerobot.xml
+  Licensed under the Apache License, Version 2.0
+  http://www.apache.org/licenses/LICENSE-2.0
+
+The STL meshes shipped with that model are not included in this repository.
+The MJCF here is an original primitive-geometry placeholder so the gymnasium
+environment can load on CPU. See docs/simulation.md before replacing it with
+the upstream assets.
+
+LeRobot (https://github.com/huggingface/lerobot) is Apache-2.0 and is used as
+an external training dependency. It is not vendored here.
