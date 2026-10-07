@@ -1,0 +1,126 @@
+<!--
+  PLACEHOLDER MJCF. Not the XLeRobot CAD model.
+
+  Joint names and ranges are adapted from the Apache-2.0 XLeRobot description:
+  https://github.com/Vector-Wangel/XLeRobot/blob/main/simulation/mujoco/xlerobot.xml
+  Meshes are not vendored. Geometry here is primitive so CPU smoke tests can load
+  the model. TODO: swap this file for upstream simulation/mujoco once the STL
+  assets are fetched (scripts/fetch_upstream_mjcf.sh) and the actuator map is
+  revisited. Upstream also has three wheel-velocity actuators and unactuated
+  head_pan_joint / head_tilt_joint that this placeholder omits.
+  See docs/simulation.md and NOTICE.
+-->
+<mujoco model="xlerobot_placeholder">
+  <compiler angle="radian" autolimits="true"/>
+
+  <default>
+    <default class="arm">
+      <joint damping="0.8" armature="0.01" frictionloss="0.05"/>
+      <geom type="capsule" size="0.015" density="0" contype="0" conaffinity="0" rgba="0.25 0.25 0.28 1"/>
+      <position kp="30" dampratio="1" forcerange="-20 20"/>
+    </default>
+    <default class="base">
+      <joint damping="8"/>
+      <velocity kv="40" forcerange="-80 80"/>
+    </default>
+  </default>
+
+  <worldbody>
+    <body name="chassis" pos="0 0 0.06">
+      <joint name="slide_joint_x" class="base" type="slide" axis="1 0 0"/>
+      <joint name="slide_joint_y" class="base" type="slide" axis="0 1 0"/>
+      <joint name="hinge_joint_z" class="base" type="hinge" axis="0 0 1"/>
+      <geom name="chassis_box" type="box" size="0.16 0.12 0.05" mass="3" rgba="0.15 0.28 0.55 1" friction="1 0.005 0.0001"/>
+
+      <body name="arm_L" pos="0.10 0.08 0.05">
+        <inertial pos="0 0 0.04" mass="0.08" diaginertia="0.0001 0.0001 0.00005"/>
+        <joint name="Rotation_L" class="arm" axis="0 -1 0" range="-2.1 2.1"/>
+        <geom class="arm" fromto="0 0 0 0 0 0.08"/>
+        <body name="upper_L" pos="0 0 0.08">
+          <inertial pos="0 0 0.05" mass="0.15" diaginertia="0.0002 0.0002 0.00005"/>
+          <joint name="Pitch_L" class="arm" axis="-1 0 0" range="-0.1 3.45"/>
+          <geom class="arm" fromto="0 0 0 0 0 0.10"/>
+          <body name="lower_L" pos="0 0 0.10">
+            <inertial pos="0 0 0.05" mass="0.12" diaginertia="0.00015 0.00015 0.00004"/>
+            <joint name="Elbow_L" class="arm" axis="1 0 0" range="-0.2 3.14159"/>
+            <geom class="arm" fromto="0 0 0 0 0 0.10"/>
+            <body name="wrist_pitch_L" pos="0 0 0.10">
+              <inertial pos="0 0 0.02" mass="0.08" diaginertia="0.00004 0.00004 0.00002"/>
+              <joint name="Wrist_Pitch_L" class="arm" axis="1 0 0" range="-1.8 1.8"/>
+              <geom class="arm" fromto="0 0 0 0 0 0.04"/>
+              <body name="wrist_roll_L" pos="0 0 0.04">
+                <inertial pos="0 0 0.02" mass="0.06" diaginertia="0.00003 0.00003 0.00002"/>
+                <joint name="Wrist_Roll_L" class="arm" axis="0 -1 0" range="-3.14159 3.14159"/>
+                <geom class="arm" fromto="0 0 0 0 0 0.04"/>
+                <body name="jaw_L" pos="0 0 0.04">
+                  <inertial pos="0 0 0.02" mass="0.04" diaginertia="0.00002 0.00002 0.00001"/>
+                  <joint name="Jaw_L" class="arm" axis="0 0 1" range="-3.14159 3.14159"/>
+                  <geom class="arm" type="box" size="0.02 0.006 0.02" pos="0 0 0.02" rgba="0.1 0.1 0.1 1"/>
+                  <site name="ee_L" pos="0 0 0.04" size="0.008" rgba="0.9 0.4 0.1 1"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <body name="arm_R" pos="0.10 -0.08 0.05">
+        <inertial pos="0 0 0.04" mass="0.08" diaginertia="0.0001 0.0001 0.00005"/>
+        <joint name="Rotation_R" class="arm" axis="0 -1 0" range="-2.1 2.1"/>
+        <geom class="arm" fromto="0 0 0 0 0 0.08"/>
+        <body name="upper_R" pos="0 0 0.08">
+          <inertial pos="0 0 0.05" mass="0.15" diaginertia="0.0002 0.0002 0.00005"/>
+          <joint name="Pitch_R" class="arm" axis="-1 0 0" range="-0.1 3.45"/>
+          <geom class="arm" fromto="0 0 0 0 0 0.10"/>
+          <body name="lower_R" pos="0 0 0.10">
+            <inertial pos="0 0 0.05" mass="0.12" diaginertia="0.00015 0.00015 0.00004"/>
+            <joint name="Elbow_R" class="arm" axis="1 0 0" range="-0.2 3.14159"/>
+            <geom class="arm" fromto="0 0 0 0 0 0.10"/>
+            <body name="wrist_pitch_R" pos="0 0 0.10">
+              <inertial pos="0 0 0.02" mass="0.08" diaginertia="0.00004 0.00004 0.00002"/>
+              <joint name="Wrist_Pitch_R" class="arm" axis="1 0 0" range="-1.8 1.8"/>
+              <geom class="arm" fromto="0 0 0 0 0 0.04"/>
+              <body name="wrist_roll_R" pos="0 0 0.04">
+                <inertial pos="0 0 0.02" mass="0.06" diaginertia="0.00003 0.00003 0.00002"/>
+                <joint name="Wrist_Roll_R" class="arm" axis="0 -1 0" range="-3.14159 3.14159"/>
+                <geom class="arm" fromto="0 0 0 0 0 0.04"/>
+                <body name="jaw_R" pos="0 0 0.04">
+                  <inertial pos="0 0 0.02" mass="0.04" diaginertia="0.00002 0.00002 0.00001"/>
+                  <joint name="Jaw_R" class="arm" axis="0 0 1" range="-3.14159 3.14159"/>
+                  <geom class="arm" type="box" size="0.02 0.006 0.02" pos="0 0 0.02" rgba="0.1 0.1 0.1 1"/>
+                  <site name="ee_R" pos="0 0 0.04" size="0.008" rgba="0.9 0.4 0.1 1"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- Fixed camera mount. Upstream head_pan_joint / head_tilt_joint are TODO. -->
+      <body name="head_camera_mount" pos="-0.08 0 0.16">
+        <geom type="sphere" size="0.02" mass="0.05" contype="0" conaffinity="0" rgba="0.85 0.2 0.2 1"/>
+        <site name="head_cam" pos="0.03 0 0" size="0.006" rgba="1 0.8 0.2 1"/>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <velocity class="base" name="slider_actuator_x" joint="slide_joint_x" ctrlrange="-1 1"/>
+    <velocity class="base" name="slider_actuator_y" joint="slide_joint_y" ctrlrange="-1 1"/>
+    <velocity class="base" name="hinge_actuator_z" joint="hinge_joint_z" ctrlrange="-1 1"/>
+
+    <position class="arm" name="Rotation_L" joint="Rotation_L" ctrlrange="-2.1 2.1"/>
+    <position class="arm" name="Pitch_L" joint="Pitch_L" ctrlrange="-0.1 3.45"/>
+    <position class="arm" name="Elbow_L" joint="Elbow_L" ctrlrange="-0.2 3.14159"/>
+    <position class="arm" name="Wrist_Pitch_L" joint="Wrist_Pitch_L" ctrlrange="-1.8 1.8"/>
+    <position class="arm" name="Wrist_Roll_L" joint="Wrist_Roll_L" ctrlrange="-3.14159 3.14159"/>
+    <position class="arm" name="Jaw_L" joint="Jaw_L" ctrlrange="-3.14159 3.14159"/>
+
+    <position class="arm" name="Rotation_R" joint="Rotation_R" ctrlrange="-2.1 2.1"/>
+    <position class="arm" name="Pitch_R" joint="Pitch_R" ctrlrange="-0.1 3.45"/>
+    <position class="arm" name="Elbow_R" joint="Elbow_R" ctrlrange="-0.2 3.14159"/>
+    <position class="arm" name="Wrist_Pitch_R" joint="Wrist_Pitch_R" ctrlrange="-1.8 1.8"/>
+    <position class="arm" name="Wrist_Roll_R" joint="Wrist_Roll_R" ctrlrange="-3.14159 3.14159"/>
+    <position class="arm" name="Jaw_R" joint="Jaw_R" ctrlrange="-3.14159 3.14159"/>
+  </actuator>
+</mujoco>

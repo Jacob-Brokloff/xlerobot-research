@@ -1,0 +1,72 @@
+name: Train on merge
+
+# Runs after a same-repo PR is merged into main. The label on that PR picks the
+# route. Dispatch stays off until a repository variable is set, so merging this
+# scaffold does not spend GPU time.
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  route:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+
+      - name: Route by label
+        id: route
+        env:
+          LABELS_JSON: ${{ toJson(github.event.pull_request.labels.*.name) }}
+        run: |
+          set +e
+          python scripts/train.py --labels-json "$LABELS_JSON" --dry-run --github-output | tee -a "$GITHUB_STEP_SUMMARY"
+          status=${PIPESTATUS[0]}
+          set -e
+          exit "$status"
+
+      - name: Hugging Face plan only
+        if: steps.route.outputs.route == 'hf' && vars.XLEROBOT_DISPATCH_HF != 'true'
+        run: |
+          echo "Label train:hf is set. XLEROBOT_DISPATCH_HF is not true, so no HF Job was submitted."
+          echo "Set the repository variable and secret HF_TOKEN, then merge another labeled PR or run the Train HF workflow."
+
+      - name: Dispatch Hugging Face Job
+        if: steps.route.outputs.route == 'hf' && vars.XLEROBOT_DISPATCH_HF == 'true'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "XLEROBOT_DISPATCH_HF=true but secret HF_TOKEN is empty."
+            echo "Add the secret before the next train:hf merge. See docs/labels-and-secrets.md"
+            exit 1
+          fi
+          python -m pip install -e ".[train]"
+          python scripts/train.py --route hf --dispatch
+
+      - name: Homelab plan only
+        if: steps.route.outputs.route == 'homelab' && vars.XLEROBOT_DISPATCH_HOMELAB != 'true'
+        run: |
+          echo "Label train:homelab is set. XLEROBOT_DISPATCH_HOMELAB is not true, so no self-hosted job was queued."
+          echo "Register a runner labeled self-hosted and xlerobot-gpu, set the variable, then merge again or run Train homelab."
+
+      - name: Dispatch homelab workflow
+        if: steps.route.outputs.route == 'homelab' && vars.XLEROBOT_DISPATCH_HOMELAB == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run train-homelab.yml --ref "${{ github.event.pull_request.base.ref }}"
